@@ -33,25 +33,23 @@ import org.apache.tools.ant.types.Path;
 
 public class RetrolambdaTask extends Task {
 
-	Map<String, Object> retrolambdaProperties = new HashMap<String, Object>();
+	@SuppressWarnings("serial")
+	Map<String, Object> retrolambdaProperties = new HashMap<String, Object>() {
+		{
+			put("retrolambda.bytecodeVersion", 51);
+			put("retrolambda.defaultMethods", false);
+			put("retrolambda.outputDir", null);
+			put("retrolambda.inputDir", null); // required
+			put("retrolambda.classpath", null); // required
+			put("retrolambda.classpathFile", null);
+			put("retrolambda.includedFiles", null);
+			put("retrolambda.includedFilesFile", null);
+			put("retrolambda.quiet", false);
+		}
+	};
 
 	private File retrolambdaJar;
 	private File java8home;
-
-	@Override
-	public void init() throws BuildException {
-		super.init();
-
-		retrolambdaProperties.put("retrolambda.bytecodeVersion", 51);
-		retrolambdaProperties.put("retrolambda.defaultMethods", false);
-		retrolambdaProperties.put("retrolambda.inputDir", null); // required
-		retrolambdaProperties.put("retrolambda.outputDir", null);
-		retrolambdaProperties.put("retrolambda.classpath", null); // required
-		retrolambdaProperties.put("retrolambda.classpathFile", null);
-		retrolambdaProperties.put("retrolambda.includedFiles", null);
-		retrolambdaProperties.put("retrolambda.includedFilesFile", null);
-		retrolambdaProperties.put("retrolambda.quiet", false);
-	}
 
 	/* Attribute setters for Ant */
 	public void setBytecodeversion(int bytecodeVersion) {
