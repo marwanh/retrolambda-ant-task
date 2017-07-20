@@ -33,18 +33,28 @@ import org.apache.tools.ant.types.Path;
 
 public class RetrolambdaTask extends Task {
 
+	private static final String RETROLAMBDA_QUIET = "retrolambda.quiet";
+	private static final String RETROLAMBDA_INCLUDED_FILES_FILE = "retrolambda.includedFilesFile";
+	private static final String RETROLAMBDA_INCLUDED_FILES = "retrolambda.includedFiles";
+	private static final String RETROLAMBDA_CLASSPATH_FILE = "retrolambda.classpathFile";
+	private static final String RETROLAMBDA_CLASSPATH = "retrolambda.classpath";
+	private static final String RETROLAMBDA_INPUT_DIR = "retrolambda.inputDir";
+	private static final String RETROLAMBDA_OUTPUT_DIR = "retrolambda.outputDir";
+	private static final String RETROLAMBDA_DEFAULT_METHODS = "retrolambda.defaultMethods";
+	private static final String RETROLAMBDA_BYTECODE_VERSION = "retrolambda.bytecodeVersion";
+
 	@SuppressWarnings("serial")
 	Map<String, Object> retrolambdaProperties = new HashMap<String, Object>() {
 		{
-			put("retrolambda.bytecodeVersion", 51);
-			put("retrolambda.defaultMethods", false);
-			put("retrolambda.outputDir", null);
-			put("retrolambda.inputDir", null); // required
-			put("retrolambda.classpath", null); // required
-			put("retrolambda.classpathFile", null);
-			put("retrolambda.includedFiles", null);
-			put("retrolambda.includedFilesFile", null);
-			put("retrolambda.quiet", false);
+			put(RETROLAMBDA_BYTECODE_VERSION, 51);
+			put(RETROLAMBDA_DEFAULT_METHODS, false);
+			put(RETROLAMBDA_OUTPUT_DIR, null);
+			put(RETROLAMBDA_INPUT_DIR, null); // required
+			put(RETROLAMBDA_CLASSPATH, null); // required
+			put(RETROLAMBDA_CLASSPATH_FILE, null);
+			put(RETROLAMBDA_INCLUDED_FILES, null);
+			put(RETROLAMBDA_INCLUDED_FILES_FILE, null);
+			put(RETROLAMBDA_QUIET, false);
 		}
 	};
 
@@ -53,39 +63,39 @@ public class RetrolambdaTask extends Task {
 
 	/* Attribute setters for Ant */
 	public void setBytecodeversion(int bytecodeVersion) {
-		retrolambdaProperties.put("retrolambda.bytecodeVersion", bytecodeVersion);
+		retrolambdaProperties.put(RETROLAMBDA_BYTECODE_VERSION, bytecodeVersion);
 	}
 
 	public void setDefaultmethods(boolean defaultMethods) {
-		retrolambdaProperties.put("retrolambda.defaultMethods", defaultMethods);
+		retrolambdaProperties.put(RETROLAMBDA_DEFAULT_METHODS, defaultMethods);
 	}
 
 	public void setInputdir(File inputDir) {
-		retrolambdaProperties.put("retrolambda.inputDir", inputDir);
+		retrolambdaProperties.put(RETROLAMBDA_INPUT_DIR, inputDir);
 	}
 
 	public void setOutputdir(File outputDir) {
-		retrolambdaProperties.put("retrolambda.outputDir", outputDir);
+		retrolambdaProperties.put(RETROLAMBDA_OUTPUT_DIR, outputDir);
 	}
 
 	public void setClasspath(Path classpath) {
-		retrolambdaProperties.put("retrolambda.classpath", classpath);
+		retrolambdaProperties.put(RETROLAMBDA_CLASSPATH, classpath);
 	}
 
 	public void setClasspathfile(File classpathFile) {
-		retrolambdaProperties.put("retrolambda.classpathFile", classpathFile);
+		retrolambdaProperties.put(RETROLAMBDA_CLASSPATH_FILE, classpathFile);
 	}
 
 	public void setIncludedfiles(Path includedFiles) {
-		retrolambdaProperties.put("retrolambda.includedFiles", includedFiles);
+		retrolambdaProperties.put(RETROLAMBDA_INCLUDED_FILES, includedFiles);
 	}
 
 	public void setIncludedfilesfile(File includedFilesFile) {
-		retrolambdaProperties.put("retrolambda.includedFilesFile", includedFilesFile);
+		retrolambdaProperties.put(RETROLAMBDA_INCLUDED_FILES_FILE, includedFilesFile);
 	}
 
 	public void setQuiet(boolean quiet) {
-		retrolambdaProperties.put("retrolambda.quiet", quiet);
+		retrolambdaProperties.put(RETROLAMBDA_QUIET, quiet);
 	}
 
 	public void setRetrolambdajar(File retrolambdaJar) {
@@ -114,9 +124,9 @@ public class RetrolambdaTask extends Task {
 	}
 
 	private void checkRequiredAttributes() throws BuildException {
-		Object inputDir = retrolambdaProperties.get("retrolambda.inputDir");
-		Object classpath = retrolambdaProperties.get("retrolambda.classpath");
-		Object classpathFile = retrolambdaProperties.get("retrolambda.classpathFile");
+		Object inputDir = retrolambdaProperties.get(RETROLAMBDA_INPUT_DIR);
+		Object classpath = retrolambdaProperties.get(RETROLAMBDA_CLASSPATH);
+		Object classpathFile = retrolambdaProperties.get(RETROLAMBDA_CLASSPATH_FILE);
 
 		if (inputDir == null || (classpath == null && classpathFile == null))
 			throw new BuildException("Attributes 'inputdir' and 'classpath' are both required.");
