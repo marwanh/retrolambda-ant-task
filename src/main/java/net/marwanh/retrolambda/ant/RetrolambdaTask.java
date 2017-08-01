@@ -79,7 +79,11 @@ public class RetrolambdaTask extends Task {
 	}
 
 	public void setClasspath(Path classpath) {
-		retrolambdaProperties.put(RETROLAMBDA_CLASSPATH, classpath);
+		addPath(classpath, RETROLAMBDA_CLASSPATH);
+	}
+
+	public void addClasspath(Path classpath) {
+		addPath(classpath, RETROLAMBDA_CLASSPATH);
 	}
 
 	public void setClasspathfile(File classpathFile) {
@@ -87,7 +91,11 @@ public class RetrolambdaTask extends Task {
 	}
 
 	public void setIncludedfiles(Path includedFiles) {
-		retrolambdaProperties.put(RETROLAMBDA_INCLUDED_FILES, includedFiles);
+		addPath(includedFiles, RETROLAMBDA_INCLUDED_FILES);
+	}
+
+	public void addIncludedfiles(Path includedFiles) {
+		addPath(includedFiles, RETROLAMBDA_INCLUDED_FILES);
 	}
 
 	public void setIncludedfilesfile(File includedFilesFile) {
@@ -138,6 +146,16 @@ public class RetrolambdaTask extends Task {
 		 */
 	}
 
+	// Adds the path p to the property named propertyName.
+	// propertyName must be one of RETROLAMBDA_INCLUDED_FILES, RETROLAMBDA_CLASSPATH
+	private void addPath(Path p, String propertyName) {
+		Path old = (Path) retrolambdaProperties.get(propertyName);
+		Path result = new Path(getProject());
+		result.append(old);
+		result.append(p);
+		retrolambdaProperties.replace(propertyName, result);
+	}
+
 	private List<String> getCommand() {
 		ArrayList<String> l = new ArrayList<>();
 
@@ -163,7 +181,6 @@ public class RetrolambdaTask extends Task {
 		for (String string : l) {
 			sb.append(string + " ");
 		}
-		System.out.println(sb.toString());
 
 		return l;
 	}
