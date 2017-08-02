@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.Path;
 
@@ -60,6 +61,14 @@ public class RetrolambdaTask extends Task {
 
 	private File retrolambdaJar;
 	private File java8home;
+	
+	private Project proj;
+	
+	@Override
+	public void init() throws BuildException {
+		super.init();
+		proj = getProject();
+	}
 
 	/* Attribute setters for Ant */
 	public void setBytecodeversion(int bytecodeVersion) {
@@ -118,6 +127,7 @@ public class RetrolambdaTask extends Task {
 	public void execute() throws BuildException {
 		checkRequiredAttributes();
 		List<String> cmd = getCommand();
+		
 
 		ProcessBuilder pb = new ProcessBuilder(cmd);
 		int exit = 0;
@@ -160,8 +170,6 @@ public class RetrolambdaTask extends Task {
 		ArrayList<String> l = new ArrayList<>();
 
 		String java = getJavaPath();
-		if (java == null)
-			throw new BuildException("Could not find the path to the Java command.");
 
 		java = Paths.get(java, "bin/java").toString();
 		l.add(java);
@@ -176,11 +184,12 @@ public class RetrolambdaTask extends Task {
 		l.add(String.format("-javaagent:%s", s));
 		l.add("-jar");
 		l.add(s);
-
+		
 		StringBuilder sb = new StringBuilder();
 		for (String string : l) {
 			sb.append(string + " ");
 		}
+		proj.log(sb.toString(), Project.MSG_INFO);
 
 		return l;
 	}
@@ -198,7 +207,8 @@ public class RetrolambdaTask extends Task {
 		// Ultimately, fallback to the system's default java path
 		if (java == null || java.isEmpty())
 			java = System.getProperty("java.home");
-
+		
+		proj.log("Java path: " + java, Project.MSG_DEBUG);
 		return java;
 	}
 }
