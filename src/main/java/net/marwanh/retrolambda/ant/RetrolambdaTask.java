@@ -153,7 +153,7 @@ public class RetrolambdaTask extends Task {
 		Path result = new Path(getProject());
 		result.append(old);
 		result.append(p);
-		retrolambdaProperties.replace(propertyName, result);
+		retrolambdaProperties.put(propertyName, result);
 	}
 
 	private List<String> getCommand() {
