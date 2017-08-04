@@ -19,18 +19,23 @@ under the License.
 
 package net.marwanh.retrolambda.ant;
 
+import java.io.ByteArrayOutputStream;
+import java.io.Console;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.Path;
+
+import net.orfjackal.retrolambda.Main;
 
 public class RetrolambdaTask extends Task {
 
@@ -45,7 +50,7 @@ public class RetrolambdaTask extends Task {
 	private static final String RETROLAMBDA_BYTECODE_VERSION = "retrolambda.bytecodeVersion";
 
 	@SuppressWarnings("serial")
-	Map<String, Object> retrolambdaProperties = new HashMap<String, Object>() {
+	private Map<String, Object> retrolambdaProperties = new HashMap<String, Object>() {
 		{
 			put(RETROLAMBDA_BYTECODE_VERSION, 51);
 			put(RETROLAMBDA_DEFAULT_METHODS, false);
@@ -59,15 +64,13 @@ public class RetrolambdaTask extends Task {
 		}
 	};
 
-	private File retrolambdaJar;
-	private File java8home;
-	
 	private Project proj;
-	
+
 	@Override
 	public void init() throws BuildException {
 		super.init();
 		proj = getProject();
+		assert proj != null;
 	}
 
 	/* Attribute setters for Ant */
@@ -115,30 +118,24 @@ public class RetrolambdaTask extends Task {
 		retrolambdaProperties.put(RETROLAMBDA_QUIET, quiet);
 	}
 
-	public void setRetrolambdajar(File retrolambdaJar) {
-		this.retrolambdaJar = retrolambdaJar;
-	}
-
-	public void setJava8home(File java8home) {
-		this.java8home = java8home;
-	}
-
 	@Override
 	public void execute() throws BuildException {
 		checkRequiredAttributes();
-		List<String> cmd = getCommand();
-		
+		configureRetrolambda();
 
-		ProcessBuilder pb = new ProcessBuilder(cmd);
-		int exit = 0;
-		try {
-			Process p = pb.start();
-			exit = p.waitFor();
-		} catch (IOException | InterruptedException ex) {
-			throw new BuildException("Failed to run Retrolambda.");
+		Main.main(null);
+	}
+
+	private void configureRetrolambda() {
+		Properties p = new Properties();
+		for (String name : retrolambdaProperties.keySet()) {
+			Object value = retrolambdaProperties.get(name);
+			if (value != null)
+				p.setProperty(name, value.toString());
 		}
-		if (exit != 0)
-			throw new BuildException("Retrolambda returned a non-zero (" + exit + ") exit code.");
+		p.list(System.out);
+		p.putAll(System.getProperties());
+		System.setProperties(p);
 	}
 
 	private void checkRequiredAttributes() throws BuildException {
@@ -148,8 +145,6 @@ public class RetrolambdaTask extends Task {
 
 		if (inputDir == null || (classpath == null && classpathFile == null))
 			throw new BuildException("Attributes 'inputdir' and 'classpath' are both required.");
-		if (retrolambdaJar == null)
-			throw new BuildException("Attribute 'retrolambdajar' must contain the full path to the Retrolambda jar.");
 		/*
 		 * if (java8home == null) throw new BuildException(
 		 * "Attribute 'java8home' must contain the path to a Java 8 JDK/JRE.");
@@ -164,51 +159,5 @@ public class RetrolambdaTask extends Task {
 		result.append(old);
 		result.append(p);
 		retrolambdaProperties.put(propertyName, result);
-	}
-
-	private List<String> getCommand() {
-		ArrayList<String> l = new ArrayList<>();
-
-		String java = getJavaPath();
-
-		java = Paths.get(java, "bin/java").toString();
-		l.add(java);
-		for (String name : retrolambdaProperties.keySet()) {
-			Object value = retrolambdaProperties.get(name);
-			if (value != null) {
-				String s = String.format("-D%s=%s", name, value);
-				l.add(s);
-			}
-		}
-		String s = retrolambdaJar.getPath();
-		l.add(String.format("-javaagent:%s", s));
-		l.add("-jar");
-		l.add(s);
-		
-		StringBuilder sb = new StringBuilder();
-		for (String string : l) {
-			sb.append(string + " ");
-		}
-		proj.log(sb.toString(), Project.MSG_INFO);
-
-		return l;
-	}
-
-	private String getJavaPath() {
-		String java = null;
-
-		// if 'java8home' attribute is set, go with it
-		if (java8home != null && java8home.exists()) {
-			java = java8home.getPath();
-		}
-		// if not, look for an environment variable
-		if (java == null || java.isEmpty())
-			java = System.getenv("JAVA8_HOME");
-		// Ultimately, fallback to the system's default java path
-		if (java == null || java.isEmpty())
-			java = System.getProperty("java.home");
-		
-		proj.log("Java path: " + java, Project.MSG_DEBUG);
-		return java;
 	}
 }
