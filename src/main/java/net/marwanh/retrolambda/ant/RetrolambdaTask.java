@@ -19,13 +19,7 @@ under the License.
 
 package net.marwanh.retrolambda.ant;
 
-import java.io.ByteArrayOutputStream;
-import java.io.Console;
 import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -63,15 +57,6 @@ public class RetrolambdaTask extends Task {
 			put(RETROLAMBDA_QUIET, false);
 		}
 	};
-
-	private Project proj;
-
-	@Override
-	public void init() throws BuildException {
-		super.init();
-		proj = getProject();
-		assert proj != null;
-	}
 
 	/* Attribute setters for Ant */
 	public void setBytecodeversion(int bytecodeVersion) {
@@ -122,7 +107,6 @@ public class RetrolambdaTask extends Task {
 	public void execute() throws BuildException {
 		checkRequiredAttributes();
 		configureRetrolambda();
-
 		Main.main(null);
 	}
 
@@ -133,7 +117,6 @@ public class RetrolambdaTask extends Task {
 			if (value != null)
 				p.setProperty(name, value.toString());
 		}
-		p.list(System.out);
 		p.putAll(System.getProperties());
 		System.setProperties(p);
 	}
@@ -145,10 +128,6 @@ public class RetrolambdaTask extends Task {
 
 		if (inputDir == null || (classpath == null && classpathFile == null))
 			throw new BuildException("Attributes 'inputdir' and 'classpath' are both required.");
-		/*
-		 * if (java8home == null) throw new BuildException(
-		 * "Attribute 'java8home' must contain the path to a Java 8 JDK/JRE.");
-		 */
 	}
 
 	// Adds the path p to the property named propertyName.
