@@ -48,6 +48,12 @@
 									<exclude>org.apache.ant:*</exclude>
 								</excludes>
 							</artifactSet>
+							<relocations>
+								<relocation>
+									<pattern>net.orfjackal.retrolambda</pattern>
+									<shadedPattern>net.marwanh.retrolambda</shadedPattern>
+								</relocation>
+							</relocations>
 						</configuration>
 					</execution>
 				</executions>
