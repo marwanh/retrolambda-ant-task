@@ -15,7 +15,6 @@
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
 	</properties>
-
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/net.orfjackal.retrolambda/retrolambda -->
 		<dependency>
@@ -28,6 +27,37 @@
 			<groupId>org.apache.ant</groupId>
 			<artifactId>ant</artifactId>
 			<version>1.10.1</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.0.0</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<artifactSet>
+								<excludes>
+									<exclude>org.apache.ant:*</exclude>
+								</excludes>
+							</artifactSet>
+							<relocations>
+								<relocation>
+									<pattern>net.orfjackal.retrolambda</pattern>
+									<shadedPattern>net.marwanh.retrolambda</shadedPattern>
+								</relocation>
+							</relocations>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
